@@ -38,24 +38,28 @@ In one line: **ADHD is what to reach for the moment a single-pass agent would gi
 
 Honest numbers. A default run is roughly:
 
-- N parallel divergence calls (default 5; can be increased)
+- 1 reframe call and 1 name-the-obvious call
+- N + 2 parallel divergence calls (N curated frames, default 5, plus the random-stimulus and reframing-questions branches)
 - 1 scoring call
 - 1 clustering call
+- H hybridize calls (default 3) and 1 call to score the hybrids
 - K deepen calls (default 3)
+- at `--depth 2`: 3 more divergence calls and 1 more scoring call
 
-That is ≈ **N + K + 2 calls** (≈10 at defaults). But **call count is the wrong unit** — token cost is what you pay, and it is dominated by *context that gets re-loaded on every branch*, not by the novel output.
+That is ≈ **N + H + K + 7 calls** (≈18 at defaults; ≈11 with `--hybrids 0 --no-stimulus --no-questions`). But **call count is the wrong unit** — token cost is what you pay, and it is dominated by *context that gets re-loaded on every branch*, not by the novel output.
 
 ### The honest cost formula
 
 Each divergence branch is a fresh, isolated context (that isolation is the whole point — see [how it works](./how-it-works.md)). So the base substrate that prefixes every call — your `CLAUDE.md`, state files, and tool context inside a Claude Code session — is paid **once per branch**, before a single novel idea token is generated:
 
 ```
-cost ≈ N × (base_context + branch_output)   ← divergence
-     + critic_context                        ← score + cluster see all N×k ideas
-     + K × deepen_context                    ← focus passes
+cost ≈ (N+2) × (base_context + branch_output)  ← divergence incl. stimulus + questions
+     + critic_context                           ← score + cluster see all (N+2)×k ideas
+     + H × hybrid_context                       ← breed pairs, then one small score call
+     + K × deepen_context                       ← focus passes
 ```
 
-The `N ×` multiplier on `base_context` is the part the simple "10 calls" framing hides. If the base substrate is ~26K tokens, five branches re-load ~130K tokens of substrate **before** any divergence — that is the real floor, and it scales with `N`, not with how much the model actually says.
+The `(N+2) ×` multiplier on `base_context` is the part the simple "18 calls" framing hides. If the base substrate is ~26K tokens, five branches re-load ~130K tokens of substrate **before** any divergence — that is the real floor, and it scales with `N`, not with how much the model actually says.
 
 ### Substrate matters more than call count
 

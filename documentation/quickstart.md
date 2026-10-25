@@ -39,10 +39,17 @@ adhd "name this feature-flag service" --frames 3 --ideas 8 --top 2
 adhd "find migration strategies" --context ./architecture.md
 # Write structured output for another program.
 adhd "design a queue" --json --quiet > result.json
+# Pull in a domain pack: forensic frames for a fuzzy bug, word frames for naming.
+adhd "why does this test flake only on CI" --pack core --pack diagnosis
+adhd "name this module" --pack language --frames 3 --hybrids 0
+# Go wider and deeper on a high-stakes decision.
+adhd "position this product" --depth 2 --wild 2
 ```
 
-Expect several LLM calls. The default flow returns clusters, a shortlist,
-traps, three deepened ideas, and a provocation.
+Expect about 18 LLM calls. The default flow names and bans the textbook
+answers, runs the frames plus a random-stimulus branch and a
+reframing-questions branch, breeds hybrids across clusters, and returns
+clusters, a shortlist, traps, three deepened ideas, and a provocation.
 
 ## Use the TypeScript library
 

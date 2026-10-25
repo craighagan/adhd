@@ -47,6 +47,7 @@ In [`src/packs/core.ts`](./src/packs/core.ts), append to the `core` array (or to
     "CI runners, vendored dependencies, mirror infrastructure. Re-ask this problem as: what " +
     "would I plant, and where, to compromise the result without touching the application code?",
   tags: ["code", "design", "wild"],
+  posture: "adversarial",
 },
 ```
 
@@ -57,7 +58,8 @@ Fields:
 | `id` | kebab-case, stable forever — don't rename |
 | `label` | shown to the user; ~3 words |
 | `prompt` | the vantage prompt. Written as instruction to the generator: *"You are X. Re-ask this as Y."* |
-| `tags` | any of `"code"`, `"design"`, `"general"`, `"wild"`. Tags affect frame selection — `code-mode` (default) biases toward `code`/`design`; `wild` always has one slot reserved per run. |
+| `tags` | any of `"code"`, `"design"`, `"general"`, `"wild"`. Tags affect frame selection — `code-mode` (default) biases toward `code`/`design`; `wild` has `--wild N` slots reserved per run (default 1). |
+| `posture` | one of `adversarial`, `naive`, `transplant`, `operator`, `extreme`, `constraint`, `forensic`. The stance the frame takes, independent of its vocabulary. Selection fills a run one posture at a time, so a frame with a rare posture is picked more often than one that joins a crowded posture. Required for built-in packs (tests enforce it). |
 
 ### Adding a pack
 
@@ -78,17 +80,17 @@ Frames for another domain go in a pack of their own rather than in `core`:
    ```ts
    import { security } from "./packs/security.js";
 
-   export const PACKS: Record<string, Frame[]> = { core, security };
+   export const PACKS: Record<string, Frame[]> = { core, diagnosis, language, time, formal, human, security };
    ```
 
-3. Select it with `--pack security` on the CLI (repeat `--pack` to pool several packs) or `packs: ["security"]` in `RunOptions`. Without either, only `core` is used. A pack with no `wild` frame still gets one from `core`, and a pack with no `code` or `design` frame is used whole under code-mode.
+3. Select it with `--pack security` on the CLI (repeat `--pack` to pool several packs) or `packs: ["security"]` in `RunOptions`. Without either, only `core` is used. Built-in packs besides `core`: `diagnosis` (forensic frames for fuzzy debugging), `language` (naming and API surface), `time` (pre-mortem, 1975, 100-year horizon), `formal` (mathematician, urban planner, mechanical engineer), `human` (dissolver, comedian, Excel power user, anthropologist). A pack with no `wild` frame still gets one from `core`, and a pack with no `code` or `design` frame is used whole under code-mode.
 
 ### Quality bar
 
 A new frame should pass at least two of these:
 
 - **Distinct vocabulary** — the prompt uses concepts (latency budget, pheromone trails, futures contracts, frame-perfect skip) that none of the existing frames use.
-- **Distinct posture** — adversarial vs constructive vs naive vs maximalist. Not just a different domain saying the same thing.
+- **Distinct posture** — adversarial vs naive vs operator vs forensic. Not just a different domain saying the same thing. If a pack would be all `transplant`, it is a vocabulary list, not a pack.
 - **Reproducible distortion** — running the same problem through this frame consistently surfaces ideas the other frames don't.
 
 ### Test it

@@ -6,6 +6,7 @@ export const core: Frame[] = [
     label: "Hardware engineer",
     prompt:
       "You think in latency, memory layout, and physical constraints. Re-ask this problem as if it were a hardware/firmware problem. What does the bus topology, the cache, the timing budget tell you?",
+    posture: "transplant",
     tags: ["code", "wild"],
   },
   {
@@ -13,6 +14,7 @@ export const core: Frame[] = [
     label: "Regulator / auditor",
     prompt:
       "You audit systems for compliance and failure modes. What ideas surface when you ask: what must be provable, traceable, or refusable here?",
+    posture: "constraint",
     tags: ["design", "general"],
   },
   {
@@ -20,6 +22,7 @@ export const core: Frame[] = [
     label: "10-year-old",
     prompt:
       "You are a curious 10-year-old who has never seen software before. Describe naive but unencumbered approaches. Ignore convention.",
+    posture: "naive",
     tags: ["general", "wild"],
   },
   {
@@ -27,6 +30,7 @@ export const core: Frame[] = [
     label: "Competitor trying to break it",
     prompt:
       "You are a hostile competitor or attacker. Generate approaches that exploit, fail, or sabotage the obvious solution. Then invert into ideas.",
+    posture: "adversarial",
     tags: ["code", "design"],
   },
   {
@@ -34,6 +38,7 @@ export const core: Frame[] = [
     label: "Cross-domain: biology",
     prompt:
       "Transplant a mechanism from biology — immune systems, neural plasticity, cell signaling, evolution, gut flora — and force-fit it onto this engineering problem.",
+    posture: "transplant",
     tags: ["code", "wild"],
   },
   {
@@ -41,6 +46,7 @@ export const core: Frame[] = [
     label: "Cross-domain: logistics / supply chain",
     prompt:
       "Steal mechanisms from logistics: queues, batching, just-in-time, hub-and-spoke, returns, last-mile. Apply them literally to this problem.",
+    posture: "transplant",
     tags: ["code", "design"],
   },
   {
@@ -48,6 +54,7 @@ export const core: Frame[] = [
     label: "Cross-domain: game design",
     prompt:
       "Approach this as a game designer. What are the loops, rewards, friction, save-states, speedrun tricks? Treat the user/system as a player.",
+    posture: "transplant",
     tags: ["design", "general"],
   },
   {
@@ -55,6 +62,7 @@ export const core: Frame[] = [
     label: "Cross-domain: markets",
     prompt:
       "Treat the problem as a market. Who are the buyers, sellers, market-makers? What does an auction, a futures contract, a clearing house look like here?",
+    posture: "transplant",
     tags: ["design", "wild"],
   },
   {
@@ -62,6 +70,7 @@ export const core: Frame[] = [
     label: "Inversion",
     prompt:
       "Ask the OPPOSITE question. If the goal is X, brainstorm 'how would we guarantee NOT-X' — then negate each answer back into an idea.",
+    posture: "operator",
     tags: ["code", "design", "general"],
   },
   {
@@ -69,6 +78,7 @@ export const core: Frame[] = [
     label: "Extreme: $0 budget, 1 hour",
     prompt:
       "You have no money, no team, one hour. What's the crudest version that still does the load-bearing thing? Hacks, hardcoded values, manual loops welcome.",
+    posture: "extreme",
     tags: ["code", "general"],
   },
   {
@@ -76,6 +86,7 @@ export const core: Frame[] = [
     label: "Extreme: infinite budget, 10 years",
     prompt:
       "You have infinite compute, infinite engineers, a decade. What does the maximalist version look like? What would only be possible at that scale?",
+    posture: "extreme",
     tags: ["design", "wild"],
   },
   {
@@ -83,6 +94,7 @@ export const core: Frame[] = [
     label: "Remove the load-bearing assumption",
     prompt:
       "Name the thing everyone treats as fixed in this problem (the framework, the database, the request/response model, the file system, the network). Imagine it's gone. Generate ideas that only exist in that world.",
+    posture: "operator",
     tags: ["code", "design", "wild"],
   },
   {
@@ -90,6 +102,7 @@ export const core: Frame[] = [
     label: "Speedrunner",
     prompt:
       "You're a speedrunner. Find glitches, skips, out-of-bounds tricks, frame-perfect shortcuts. What's the abusive-but-legal path through this problem?",
+    posture: "adversarial",
     tags: ["code", "wild"],
   },
   {
@@ -97,6 +110,7 @@ export const core: Frame[] = [
     label: "Ant colony / swarm",
     prompt:
       "No central planner. Many dumb agents, local rules, pheromone trails. How does the problem solve itself emergently?",
+    posture: "transplant",
     tags: ["code", "wild"],
   },
   {
@@ -104,6 +118,7 @@ export const core: Frame[] = [
     label: "On-call at 3am",
     prompt:
       "You're the on-call engineer woken at 3am when this thing breaks. What design would let you not get paged? What's the runbook-shaped solution?",
+    posture: "constraint",
     tags: ["code", "design"],
   },
 ];

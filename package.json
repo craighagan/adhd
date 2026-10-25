@@ -1,7 +1,7 @@
 {
   "name": "adhd-agent",
-  "version": "0.1.4",
-  "description": "ADHD — a skill for coding agents. Fans out many divergent thoughts in parallel under different cognitive frames, scores them, prunes traps, and deepens the survivors. Tree-of-thought with pruning, built on the Claude Agent SDK. The no-brainer skill for creative and interdisciplinary work.",
+  "version": "0.2.0",
+  "description": "ADHD — a skill for coding agents. Names and bans the obvious answers, fans out many divergent thoughts in parallel under different cognitive frames plus a random stimulus, scores them, breeds cross-cluster hybrids, prunes traps, and deepens the survivors. Tree-of-thought with pruning, built on the Claude Agent SDK. The no-brainer skill for creative and interdisciplinary work.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

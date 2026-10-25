@@ -19,9 +19,13 @@ adhd "..." --json > result.json
 
 | Flag | Default | What |
 | --- | --- | --- |
-| `--frames N` | 5 | parallel divergence branches |
+| `--frames N` | 5 | curated frames per run; the stimulus and questions branches run in addition |
+| `--wild N` | 1 | wild-tagged frames reserved among those (0 = none reserved, N = all wild) |
 | `--ideas N` | 6 | ideas per branch |
-| `--top N` | 3 | how many to deepen / focus |
+| `--top N` | 3 | how many to deepen / focus, spread across clusters |
+| `--hybrids N` | 3 | cross-cluster pairs to breed after clustering (0 disables) |
+| `--depth 1\|2` | 1 | 2 = re-diverge on the non-obvious pick with 3 fresh frames before deepening |
+| `--stimulus WORD` | random | pin the random-stimulus noun for a reproducible run |
 | `--concurrency N` | 4 | max parallel LLM calls |
 | `--context PATH` | — | inject a file as context (code, stack, constraints) |
 | `--model NAME` | SDK default | override model (generator + critic) |
@@ -29,16 +33,24 @@ adhd "..." --json > result.json
 | `--pack NAME` | `core` | draw frames from this pack; repeat to pool several packs |
 | `--no-code-mode` | — | don't bias frames toward engineering |
 | `--no-anchor-strip` | — | don't strip incidental anchors (stack, tool names) from the problem before fan-out |
+| `--no-ban-obvious` | — | skip naming the 3–5 textbook answers and passing them to every branch as a banlist |
+| `--no-stimulus` | — | skip the random-stimulus branch |
+| `--no-questions` | — | skip the reframing-questions branch |
 | `--json` | — | emit machine-readable `RunResult` |
 | `--quiet` | — | suppress progress events |
 
 ## Library (TypeScript)
 
 ```ts
-import { run, renderText, FRAMES, PACKS, selectFrames } from "adhd-agent";
+import {
+  run, renderText, allIdeas,
+  FRAMES, PACKS, POSTURES, selectFrames,
+  STIMULUS_WORDS, stimulusFrame,
+  pickDiverse, pickHybridPairs,
+} from "adhd-agent";
 import type {
-  RunOptions, RunResult, Idea, Branch, Cluster,
-  DeepenedIdea, Score, RunEvent,
+  RunOptions, RunResult, Idea, IdeaKind, Branch, Cluster,
+  DeepenedIdea, Score, RunEvent, Frame, Posture,
 } from "adhd-agent";
 
 type RunOptions = {
@@ -49,7 +61,17 @@ type RunOptions = {
   topK?: number;           // default 3
   concurrency?: number;    // default 4
   codeMode?: boolean;      // default true
+  wild?: number;           // wild-tagged frames reserved per run, default 1
   stripAnchors?: boolean;  // strip incidental anchors before fan-out, default true
+  banObvious?: boolean;    // name the textbook answers and ban them by name, default true
+  stimulus?: boolean;      // add the random-stimulus branch, default true
+  stimulusWord?: string;   // pin the stimulus noun
+  questions?: boolean;     // add the reframing-questions branch, default true
+  hybridPairs?: number;    // cross-cluster pairs to breed, default 3 (0 disables)
+  depth?: 1 | 2;           // 2 = second round on the non-obvious pick, default 1
+  llm?: (o: LLMOptions) => Promise<string>;
+                           // replace the model call; default is the Claude Agent SDK
+                           // one-shot. Use for tests or another provider.
   model?: string;          // generator + critic
   criticModel?: string;    // critic (score + cluster) only; defaults to `model`
   packs?: string[];        // default ["core"]
@@ -71,18 +93,24 @@ const result = await run({
 
 console.log(renderText(result));
 // or operate on:
-//   result.shortlist        → 2–4 most promising ideas with scores
+//   result.obvious          → the textbook answers that were banned by name
+//   result.stimulus         → the random noun the stimulus branch was forced to use
+//   result.shortlist        → 2–4 most promising ideas with scores, spread across clusters
 //   result.nonObviousPick   → the highest-novelty viable one
+//   result.hybrids          → ideas bred across clusters (idea.parentIds names the parents)
+//   result.secondRound      → depth-2 branches seeded by the non-obvious pick
 //   result.traps            → "looks good but isn't" list, with reasons
 //   result.deepened         → top-K expanded: sketch + risk + first step + child ideas
 //   result.clusters         → the SHAPE of the idea space
+// Every idea carries idea.kind: "frame" | "stimulus" | "question" | "hybrid" | "round2".
+// allIdeas(result) returns the whole pool in display order.
 ```
 
-Frames come from named packs. `PACKS` maps each pack name to its frames (`FRAMES` is the `core` pack), and `selectFrames(n, codeMode, packs)` pools the named packs before picking. An unknown name or an empty list throws.
+Frames come from named packs. `PACKS` maps each pack name to its frames (`FRAMES` is the `core` pack), and `selectFrames(n, codeMode, packs, options)` pools the named packs before picking: `options.wild` reserves wild slots (default 1) and `options.exclude` keeps named frame ids out. Picks are spread across `POSTURES`. An unknown name or an empty list throws.
 
 ```ts
-console.log(Object.keys(PACKS)); // ["core"]
-const frames = selectFrames(4, true, ["core"]);
+console.log(Object.keys(PACKS)); // ["core", "diagnosis", "language", "time", "formal", "human"]
+const frames = selectFrames(4, true, ["core", "diagnosis"], { wild: 2 });
 ```
 
 Everything in `RunResult` is structured — clusters, scored ideas with `novelty / viability / fit`, trap reasons, deepened sketches with child ideas. You can route it into your own renderer, downstream agent, or planning loop.

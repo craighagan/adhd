@@ -135,10 +135,11 @@ Full reference: **[documentation/api.md](./documentation/api.md)**.
 
 ## How it works
 
-A two-phase loop with a hard wall between the phases.
+A short setup pass, then a two-phase loop with a hard wall between the phases.
 
-1. **Diverge.** Pick N cognitive frames. Spawn N parallel, **isolated** Agent calls — each sees the problem plus one frame's vantage prompt, and a system prompt that forbids evaluation. Branches never see each other, so no anchoring.
-2. **Focus.** A separate critic call scores every idea (`novelty / viability / fit`), flags traps with reasons, clusters by underlying angle, and deepens the top-K survivors into sketches with risks and first steps.
+0. **Name the obvious.** One cheap call lists the 3–5 textbook answers. Every branch gets them as a banlist by name, and the critic measures novelty as distance from that list.
+1. **Diverge.** Pick N cognitive frames, spread across **postures** (adversarial, naive, transplant, operator, extreme, constraint, forensic), plus a **random-stimulus** branch forced to connect the problem to a random noun and a **reframing-questions** branch that outputs only questions. Spawn them as parallel, **isolated** Agent calls — each sees the problem, the banlist, and one frame's vantage prompt, under a system prompt that forbids evaluation. Branches never see each other, so no anchoring.
+2. **Focus.** A separate critic call scores every idea (`novelty / viability / fit`), flags traps with reasons, and clusters by underlying angle. Then it **breeds hybrids** across clusters — the one class of idea no single frame can produce — scores them on equal terms, and deepens the top-K survivors, spread across clusters, into sketches with risks and first steps. `--depth 2` re-diverges on the non-obvious pick with fresh frames first.
 
 The generator-critic split is **mechanical** — separate LLM calls with opposite system prompts — not promised in one prompt. Deep dive: **[documentation/how-it-works.md](./documentation/how-it-works.md)**. How it differs from CoT and ToT: **[documentation/vs-cot-and-tot.md](./documentation/vs-cot-and-tot.md)**.
 
@@ -172,7 +173,7 @@ In-repo pages:
 | [Install](./documentation/install.md) | Every install path — skill, CLI, library, Agent SDK, per-platform |
 | [How it works](./documentation/how-it-works.md) | The two-phase loop + architecture (context, pruning, orchestration) |
 | [vs CoT & ToT](./documentation/vs-cot-and-tot.md) | Structural comparison, the three load-bearing differences, frames vs personas |
-| [Frames](./documentation/frames.md) | The 15 cognitive frames, how selection works, how to author your own |
+| [Frames](./documentation/frames.md) | The 31 cognitive frames in 6 packs, postures, how selection works, how to author your own |
 | [When to use](./documentation/when-to-use.md) | Use / don't use, why it shines on creative work, cost & speed |
 | [CLI & API](./documentation/api.md) | CLI flags, library types, using ADHD inside your own agent |
 | [Evals](./documentation/evals.md) | Methodology, headline numbers, limitations, roadmap |
